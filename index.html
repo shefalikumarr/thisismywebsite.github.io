@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Background Image Overlap</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      background-color: black;
+    }
+
+    .background-container {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      overflow: hidden;
+      z-index: 0; /* Ensure images stay behind */
+    }
+
+    .background-image {
+      position: absolute;
+      opacity: 0.8;
+    }
+
+    .welcome-text {
+      position: absolute;
+      top: 10%;
+      left: 17%;
+      font-family: 'Rockwell-Bold', sans-serif;
+      color: #FFDC00;
+      font-size: 5vw;
+      line-height: 1;
+      z-index: 100; /* Ensure text is always on top */
+    }
+
+    .photographs-text {
+      position: absolute;
+      top: calc(20% + 5vw); /* 10% from the first text */
+      right: 30%; /* 30% from the right */
+      font-family: 'Rockwell-Bold', sans-serif;
+      color: #FFDC00;
+      font-size: 3vw; /* Smaller font size */
+      line-height: 1;
+      z-index: 100; /* Ensure text is always on top */
+      text-decoration: none; /* Remove underline */
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .photographs-text:hover {
+      color: #FFF7C6; /* Change color on hover */
+      transform: scale(1.05); /* Enlarge text */
+      text-decoration: none; /* Remove underline */
+    }
+
+    .essays-text {
+      position: absolute;
+      top: calc(20% + 10vw); /* 30% down from the first text */
+      left: 30%; /* 30% from the left */
+      font-family: 'Rockwell-Bold', sans-serif;
+      color: #FFDC00;
+      font-size: 3vw; /* Smaller font size */
+      line-height: 1;
+      z-index: 100; /* Ensure text is always on top */
+      text-decoration: none; /* Remove underline */
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .essays-text:hover {
+      color: #FFF7C6; /* Change color on hover */
+      transform: scale(1.05); /* Enlarge text */
+      text-decoration: none; /* Remove underline */
+    }
+
+    .about-text {
+      position: absolute;
+      top: calc(10% + 25vw); /* 50% down from the first text */
+      left: 50%; /* 50% from the left */
+      font-family: 'Rockwell-Bold', sans-serif;
+      color: #FFDC00;
+      font-size: 3vw; /* Smaller font size */
+      line-height: 1;
+      z-index: 100; /* Ensure text is always on top */
+      text-decoration: none; /* Remove underline */
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .about-text:hover {
+      color: #FFF7C6; /* Change color on hover */
+      transform: scale(1.05); /* Enlarge text */
+      text-decoration: none; /* Remove underline */
+    }
+  </style>
+</head>
+<body>
+  <div class="background-container" id="backgroundContainer"></div>
+  <div class="welcome-text">hi, i'm shefali</div>
+  <a href="photographs.html" class="photographs-text">photographs</a>
+  <a href="essays.html" class="essays-text">essays</a>
+  <a href="about.html" class="about-text">about me</a>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const links = document.querySelectorAll('.photographs-text, .essays-text, .about-text');
+      links.forEach(link => {
+        link.style.pointerEvents = 'auto';
+      });
+    });
+
+    const imagePaths = [
+    'images/DSCF3284.jpg',
+    'images/DSCF3482.jpg',
+    'images/DSCN1074.jpg',
+    'images/IMG_0235.jpeg',
+    'images/IMG_0984.jpeg'
+    ];
+
+    let currentHeight = 0;
+    let lastUsedImages = [];
+
+    function preloadImages(paths) {
+      paths.forEach((path) => {
+        const img = new Image();
+        img.src = path;
+      });
+    }
+
+    function getRandomImage() {
+      const availableImages = imagePaths.filter(img => !lastUsedImages.includes(img));
+      const selectedImage = availableImages[Math.floor(Math.random() * availableImages.length)];
+
+      // Update lastUsedImages to avoid immediate repetition
+      lastUsedImages.push(selectedImage);
+      if (lastUsedImages.length > 2) lastUsedImages.shift();
+
+      return selectedImage;
+    }
+
+    function placeQuadrantImages() {
+      const container = document.getElementById('backgroundContainer');
+      const containerWidth = window.innerWidth;
+      const containerHeight = window.innerHeight;
+      const quadrantWidth = containerWidth / 2;
+      const quadrantHeight = containerHeight / 2;
+
+      for (let row = 0; row < 2; row++) {
+        for (let col = 0; col < 2; col++) {
+          const img = document.createElement('img');
+          img.src = getRandomImage();
+          img.classList.add('background-image');
+
+          img.style.width = '100%';
+          img.style.height = 'auto';
+          img.style.left = `${col * quadrantWidth}px`;
+          img.style.top = `${row * quadrantHeight}px`;
+          img.style.zIndex = 0;
+
+          container.appendChild(img);
+        }
+      }
+    }
+
+    function placeRandomImages(batchSize = 10) {
+      const container = document.getElementById('backgroundContainer');
+      const containerWidth = window.innerWidth;
+      const containerHeight = window.innerHeight;
+
+      for (let i = 0; i < batchSize; i++) {
+        const img = document.createElement('img');
+        img.src = getRandomImage();
+        img.classList.add('background-image');
+
+        img.style.width = `${Math.random() * (80 - 50) + 50}vw`; // 50vw to 80vw
+        img.style.height = 'auto';
+        img.style.left = `${Math.random() * (containerWidth * 1.2) - (containerWidth * 0.1)}px`; // Random horizontal position with edge coverage
+        img.style.top = `${currentHeight + Math.random() * containerHeight - (containerHeight * 0.3)}px`; // Random vertical position, ensuring overlap to edges
+        img.style.zIndex = 0; // Ensure images stay behind text
+
+        container.appendChild(img);
+      }
+
+      currentHeight += containerHeight;
+      container.style.height = `${currentHeight}px`;
+    }
+
+    function onScroll() {
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 200) {
+        requestAnimationFrame(() => placeRandomImages(20));
+      }
+    }
+
+    // Preload all images
+    preloadImages(imagePaths);
+
+    // Initialize with quadrant images and a batch for overlap
+    placeQuadrantImages();
+    placeRandomImages(30);
+    window.addEventListener('scroll', onScroll);
+  </script>
+</body>
+</html>
